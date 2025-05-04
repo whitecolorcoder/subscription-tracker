@@ -33,7 +33,7 @@ def upgrade() -> None:
     sa.UniqueConstraint('email')
     )
     op.create_table('subscriptions',
-    sa.Column('id', sa.Uuid(), nullable=False, comment='ID подписки'),
+    sa.Column('id', sa.Integer(), nullable=False, comment='ID подписки'),
     sa.Column('user_id', sa.Integer(), nullable=False, comment='Ссылка на пользователя'),
     sa.Column('name', sa.String(length=255), nullable=False, comment='Название'),
     sa.Column('category', sa.String(length=255), nullable=False, comment='Категория'),
@@ -51,7 +51,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('expenses',
-    sa.Column('id', sa.Uuid(), nullable=False, comment='ID расхода'),
+    sa.Column('id', sa.Integer(), nullable=False, comment='ID расхода'),
     sa.Column('user_id', sa.Integer(), nullable=False, comment='Ссылка на пользователя'),
     sa.Column('subscription_id', sa.Uuid(), nullable=True, comment='Ссылка на подписку (опц.)'),
     sa.Column('amount', sa.Numeric(precision=12, scale=2), nullable=False, comment='Сумма'),
