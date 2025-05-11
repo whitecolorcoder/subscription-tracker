@@ -4,6 +4,20 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+
+
+from alembic import context
+from src.models.base import Base
+from src.models.users import User
+from src.models.expenses import Expense
+from src.models.subscription import Subscription 
+from src.models.payment_history import PaymentHistory
+from src.models.trial_notifications import  TrialNotification
+from src.models.notifications import Notification
+from src.models.websocket_sessions import WebSocketSession
+from src.models.telegram_links import TelegramLink
+from src.config import settings
+
 from src.models.base import Base
 from src.models.users import User
 from src.models.expenses import Expense
@@ -18,7 +32,7 @@ from src.config import settings
 
 
 # this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# access to the vaBase.metadata within the .ini file in use.
 config = context.config
 
 # Interpret the config file for Python logging.

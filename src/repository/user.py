@@ -9,4 +9,8 @@ class UserRepo:
         self.model = User
 
     def back_information_from_user(self, id: int) -> User:
-        return self.session.get(self.model, id)
+        try:
+            return self.session.get(self.model, id) 
+        except Exception:
+            raise Exception
+            

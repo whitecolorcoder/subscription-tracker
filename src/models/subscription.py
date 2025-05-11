@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from .base import Base  # Базовый класс моделей
 
-import uuid
+
 
 class Subscription(Base):
     __tablename__ = "subscriptions"
