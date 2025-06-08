@@ -10,4 +10,4 @@ class TelegramLink(Base):
     telegram_id: Mapped[int] = mapped_column(BigInteger)
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    user = relationship("User", back_populates="telegram_link")
+    # user = relationship("User", back_populates="telegram_link")

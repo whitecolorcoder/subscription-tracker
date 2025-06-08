@@ -11,6 +11,8 @@ from src.config import settings
 from src.repository.user import UserRepo
 from pydantic import BaseModel, EmailStr
 
+from src.services.password_service import PasswordsService
+
 
 engine=create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
@@ -24,11 +26,15 @@ SessionDep = Annotated[Session, Depends(get_session)]
 def get_user_repo(session: SessionDep) -> UserRepo:
     return UserRepo(session=session)
 
-UserRepoDep = Annotated[Session, Depends(get_user_repo)] 
+UserRepoDep = Annotated[UserRepo, Depends(get_user_repo)] 
 
 def get_subscription_repo(session: SessionDep) -> SubscriptionRepo:
     return SubscriptionRepo(sessiom=session)
-SubscriptionRepoDep = Annotated[Session, Depends(get_subscription_repo)] 
 
+SubscriptionRepoDep = Annotated[SubscriptionRepo, Depends(get_subscription_repo)] 
 
+def get_password_services()-> PasswordsService:
+    return PasswordsService()
+
+PasswordsServiceDep = Annotated[PasswordsService, Depends(get_password_services)]
 

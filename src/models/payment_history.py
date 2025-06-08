@@ -17,6 +17,6 @@ class PaymentHistory(Base):
     gateway: Mapped[str] = mapped_column(String(32))
     receipt_url: Mapped[str] = mapped_column(String(512))
 
-    user = relationship("User", back_populates="payment_history")
-    subscription = relationship("Subscription", back_populates="payment_history")
-    notifications = relationship("Notification", back_populates="payment")
+    # user = relationship("User", back_populates="payment_history")
+    # subscription = relationship("Subscription", back_populates="payment_history")
+    # notifications = relationship("Notification", back_populates="payment")

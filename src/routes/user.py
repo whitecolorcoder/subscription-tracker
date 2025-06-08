@@ -3,9 +3,9 @@ from datetime import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi import APIRouter
+from fastapi import APIRouter, Path, HTTPException
 from src.config import settings
-from src.repository.user import UserRepo
+from src.repository.user import NoUserInDb, UserRepo
 from pydantic import BaseModel, EmailStr
 
 from .deps import UserRepoDep
@@ -17,13 +17,19 @@ class UserResponceModel(BaseModel):
     email: EmailStr
     hashed_password: str
     is_active: bool
-    subscriptiondatetime: float
     currency_preference: str
     created_at: datetime
 
-@router.get("/", response_model=UserResponceModel)
+@router.get("/{id}", response_model=UserResponceModel)
 def root(id: int, user_repo: UserRepoDep):
-    return UserResponceModel(**user_repo.back_information_from_user(id))
+    try:
+        user = user_repo.back_information_from_user(id)
+        return user   
+    except NoUserInDb:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+     
+
     
 
 

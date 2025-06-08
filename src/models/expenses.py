@@ -23,5 +23,5 @@ class Expense(Base):
     description: Mapped[str] = mapped_column(Text)
     category: Mapped[str] = mapped_column(String(100))
 
-    user = relationship("User", back_populates="expenses")
-    subscription = relationship("Subscription", back_populates="expenses")
+    # user = relationship("User", back_populates="expenses")
+    # subscription = relationship("Subscription", back_populates="expenses")

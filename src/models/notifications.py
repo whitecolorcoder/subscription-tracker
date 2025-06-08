@@ -16,6 +16,6 @@ class Notification(Base):
     message: Mapped[str] = mapped_column(Text)
     sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    user = relationship("User", back_populates="notifications")
-    subscription = relationship("Subscription", back_populates="notifications")
-    payment = relationship("PaymentHistory", back_populates="notifications")
+    # user = relationship("User", back_populates="notifications")
+    # subscription = relationship("Subscription", back_populates="notifications")
+    # payment = relationship("PaymentHistory", back_populates="notifications")

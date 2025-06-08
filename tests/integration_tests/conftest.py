@@ -1,5 +1,7 @@
-from fastapi import Depends
+from fastapi import Depends, FastAPI
+from fastapi.testclient import TestClient
 from typing import Annotated
+from faker import Faker
 
 from datetime import datetime
 from src.repository.subscription import SubscriptionRepo
@@ -10,27 +12,40 @@ from fastapi import APIRouter
 from src.config import settings
 from src.repository.user import UserRepo
 from pydantic import BaseModel, EmailStr
+from src.__main__ import app
+from src.models.users import User
 
 
-engine=create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+# Create engine outside fixture so it persists
+engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+TestingSessionLocal = sessionmaker(bind=engine)
 
-@pytest.fixture
+
+@pytest.fixture(scope='function')
 def get_session() -> Session:
-    session=sessionmaker(bind=engine)
-    with session() as session: 
+    session = TestingSessionLocal()
+    try:
         yield session
-        
+    finally:
+        session.close()
+
+
+@pytest.fixture(scope='function')
+def add_user(get_session):
+    faker = Faker()
+    user = User(email=faker.email(), hashed_password='qwerty')
+    get_session.add(user)
+    get_session.commit()
+    get_session.refresh(user) 
+    yield user
+    get_session.delete(user)
+    get_session.commit()
+
+
 @pytest.fixture       
-def get_user_repo(get_session) -> UserRepo:
-    return UserRepo(session=session)
-
-# UserRepoDep = Annotated[Session, Depends(get_user_repo)] 
-
-# def get_subscription_repo(session: SessionDep) -> SubscriptionRepo:
-#     return SubscriptionRepo(sessiom=session)
-# SubscriptionRepoDep = Annotated[Session, Depends(get_subscription_repo)] 
-
-
+def get_app() -> TestClient:
+    return TestClient(app=app)
+    
 '''
 Создать фикстуру которая добавляет данные перед тестом в базу данных
 а потом очищает базу данных

@@ -12,4 +12,4 @@ class WebSocketSession(Base):
     connected_at: Mapped[datetime] = mapped_column(DateTime)
     disconnected_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    user = relationship("User", back_populates="websocket_sessions")
+    # user = relationship("User", back_populates="websocket_sessions")

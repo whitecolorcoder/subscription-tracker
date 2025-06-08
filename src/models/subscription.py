@@ -3,12 +3,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID, uuid4
 from datetime import datetime
 from decimal import Decimal
-
 # from src.models.expenses import Expense
 # from src.models.users import User
 
 from .base import Base  # Базовый класс моделей
-
 
 
 class Subscription(Base):
@@ -29,8 +27,8 @@ class Subscription(Base):
     logo_url: Mapped[str] = mapped_column(String(512))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    user = relationship("User", back_populates="subscriptions")
-    expenses = relationship("Expense", back_populates="subscription", cascade="all, delete-orphan")
-    payment_history = relationship("PaymentHistory", back_populates="subscription", cascade="all, delete-orphan")
-    trial_notifications = relationship("TrialNotification", back_populates="subscription", cascade="all, delete-orphan")
-    notifications = relationship("Notification", back_populates="subscription", cascade="all, delete-orphan")
+    # user = relationship("User", back_populates="subscriptions")
+    # expenses = relationship("Expense", back_populates="subscription", cascade="all, delete-orphan")
+    # payment_history = relationship("PaymentHistory", back_populates="subscription", cascade="all, delete-orphan")
+    # trial_notifications = relationship("TrialNotification", back_populates="subscription", cascade="all, delete-orphan")
+    # notifications = relationship("Notification", back_populates="subscription", cascade="all, delete-orphan")

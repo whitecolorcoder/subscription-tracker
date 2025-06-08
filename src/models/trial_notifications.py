@@ -14,5 +14,5 @@ class TrialNotification(Base):
     is_sent: Mapped[bool] = mapped_column(Boolean, default=False)
     sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    user = relationship("User", back_populates="trial_notifications")
-    subscription = relationship("Subscription", back_populates="trial_notifications")
+    # user = relationship("User", back_populates="trial_notifications")
+    # subscription = relationship("Subscription", back_populates="trial_notifications")

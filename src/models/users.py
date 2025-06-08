@@ -17,13 +17,13 @@ class User(Base):
     currency_preference: Mapped[str] = mapped_column(String(8), default='RUB')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
-    expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
-    payment_history = relationship("PaymentHistory", back_populates="user", cascade="all, delete-orphan")
-    trial_notifications = relationship("TrialNotification", back_populates="user", cascade="all, delete-orphan")
-    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
-    websocket_sessions = relationship("WebSocketSession", back_populates="user", cascade="all, delete-orphan")
-    telegram_link = relationship("TelegramLink", back_populates="user", cascade="all, delete-orphan", uselist=False)
+    # subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
+    # expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
+    # payment_history = relationship("PaymentHistory", back_populates="user", cascade="all, delete-orphan")
+    # trial_notifications = relationship("TrialNotification", back_populates="user", cascade="all, delete-orphan")
+    # notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    # websocket_sessions = relationship("WebSocketSession", back_populates="user", cascade="all, delete-orphan")
+    # telegram_link = relationship("TelegramLink", back_populates="user", cascade="all, delete-orphan", uselist=False)
 
 
     def __repr__(self) -> str:
