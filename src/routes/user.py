@@ -28,6 +28,8 @@ def root(id: int, user_repo: UserRepoDep):
     except NoUserInDb:
         raise HTTPException(status_code=404, detail="User not found")
     
+
+    
      
 
     

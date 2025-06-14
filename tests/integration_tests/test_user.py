@@ -26,8 +26,32 @@ def test_sucess_user_registration(get_app, get_session):
     
     assert user.email == email
     assert user.hashed_password is not None
+    get_session.delete(user)
+    get_session.commit()
+
+def test_user_already_exsists(get_app, add_user):
+    duplicate_response = get_app.post(
+        '/auth/protected',
+        json={
+            "email": add_user.email,
+            "password": add_user.hashed_password,
+        }
+    )
+    assert duplicate_response.status_code == 400 
+        
     
-#def test_user_already_exsists
+def test_sucess_login(get_app, add_user):
+    responce = get_app.post('/auth/login', json={"email": add_user.email,
+    "password": 'qwerty123'})
+    assert responce.status_code == 200
+    body = responce.json()
+    assert isinstance(body['token'], str)
     
         
+def test_not_sucess_login(get_app, add_user):
+    responce = get_app.post('/auth/login', json={"email": add_user.email,
+    "password": 'dfdfsdfsdf'})
+    assert responce.status_code == 401
+    body = responce.json()
+    assert body['detail'] == 'Invalid credentials'
     

@@ -14,7 +14,7 @@ from src.repository.user import UserRepo
 from pydantic import BaseModel, EmailStr
 from src.__main__ import app
 from src.models.users import User
-
+from src.services.password_service import PasswordsService
 
 # Create engine outside fixture so it persists
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
@@ -31,9 +31,11 @@ def get_session() -> Session:
 
 
 @pytest.fixture(scope='function')
-def add_user(get_session):
+def add_user(get_session)-> User:
     faker = Faker()
-    user = User(email=faker.email(), hashed_password='qwerty')
+    pasword_service = PasswordsService()
+    password = 'qwerty123'
+    user = User(email=faker.email(), hashed_password=pasword_service.create_hash(password))
     get_session.add(user)
     get_session.commit()
     get_session.refresh(user) 
