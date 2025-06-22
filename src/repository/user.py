@@ -33,6 +33,22 @@ class UserRepo:
         self.session.add(new_user)
         #try:
         self.session.commit()
+    ###
+    def hard_delete_user(self, user_id: int) -> bool:
+        user = self.session.get(self.model, user_id)
+        if not user:
+            return False
+        self.session.delete(user)
+        self.session.commit()
+        return True
+    
+    def soft_delete_user(self, user_id: int) -> bool:
+        user = self.session.get(self.model, user_id)
+        if not user or not user.is_active:
+            return False
+        user.is_active = False
+        self.session.commit()
+        return True
         
         
     

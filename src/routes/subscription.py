@@ -8,11 +8,13 @@ from src.config import settings
 from src.repository.subscription import SubscriptionRepo
 from pydantic import BaseModel
 
-from .deps import SubscriptionRepoDep
+from src.routes.auth import TokenBodyRequest
+
+from .deps import JWTServiceDep, SubscriptionRepoDep
 
 router= APIRouter(prefix='/subscription')
 
-class SubscriptionModel(BaseModel):
+class SubscriptionResponceModel(BaseModel):
     id: int
     user_id: int
     name: str
@@ -28,7 +30,11 @@ class SubscriptionModel(BaseModel):
     logo_url: str
     created_at: datetime
 
-@router.get("/", response_model=SubscriptionModel)
-def register_subscription(id: int, subscription_repo: SubscriptionRepoDep):
-    return SubscriptionModel(**subscription_repo.list_subscription_users(id))
+# @router.get("/", response_model=SubscriptionModel)
+# def register_subscription(id: int, subscription_repo: SubscriptionRepoDep):
+#     return SubscriptionModel(**subscription_repo.list_subscription_users(id))
+
+@router.get('/', response_model=list[SubscriptionResponceModel], status_code=201)
+def get_user_subscriptions(repo: SubscriptionRepoDep, jwt_services: JWTServiceDep, body:TokenBodyRequest):
+    return repo.get_subscriptions_by_user(jwt_services.check_jwt(body.jwt_token)[1])
 

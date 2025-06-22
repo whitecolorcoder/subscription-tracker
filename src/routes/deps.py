@@ -40,5 +40,6 @@ PasswordsServiceDep = Annotated[PasswordsService, Depends(get_password_services)
 def get_jwt_service()-> JWTService:
     return JWTService(config=settings)
 
-
 JWTServiceDep = Annotated[JWTService, Depends(get_jwt_service)]
+
+

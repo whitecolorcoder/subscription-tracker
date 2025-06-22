@@ -1,6 +1,8 @@
 from sqlalchemy import select
 from src.models.users import User
+from src.services.jwt_token_services import JWTService
 from tests.integration_tests.conftest import add_user
+from src.config import settings
 
 
 def test_no_user_in_db(get_app):
@@ -54,4 +56,10 @@ def test_not_sucess_login(get_app, add_user):
     assert responce.status_code == 401
     body = responce.json()
     assert body['detail'] == 'Invalid credentials'
-    
+
+def test_get_user_subscriptions(get_app, add_subscriptions, add_user):
+    jwt = JWTService(config=settings).create_jwt(add_user.id)
+    response = get_app.get('/subscription',json={"jwt_token": jwt})
+    assert response.status_code == 201
+    body = response.json()
+    assert len(body) == 1

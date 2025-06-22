@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.models.subscription import Subscription
 
@@ -8,9 +9,12 @@ class SubscriptionRepo:
         self.session = session
         self.model = Subscription
 
-    def list_subscription_users(self, id: int) -> Subscription:
+    def get_subscriptions_by_user(self, user_id: int) -> list[Subscription]:
         try:
-            return self.session.get(self.model, id) 
-        except Exception:
-            raise Exception
+            stmt = select(self.model).where(self.model.user_id == user_id)
+            result = self.session.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise Exception from e
+    
             
