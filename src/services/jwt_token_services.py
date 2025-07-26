@@ -27,4 +27,3 @@ class JWTService:
             return new_token, payload['user_id']
         except InvalidTokenError:
             raise InvalidTokenError
-            

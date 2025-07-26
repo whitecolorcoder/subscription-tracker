@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from src.models.users import User
@@ -9,17 +9,17 @@ class NoUserInDb(Exception):
 
 class UserRepo:
     """Отвечает за запросы в таблицу users"""
-    
+
     def __init__(self, session: Session):
         self.session = session
         self.model = User
 
     def back_information_from_user(self, id: int) -> User:
-        user = self.session.get(self.model, id) 
+        user = self.session.get(self.model, id)
         if user is None:
-            raise NoUserInDb 
+            raise NoUserInDb
         return user
-         
+
     def get_user_by_email(self, email: str) -> User:
         stmt = select(self.model).where(self.model.email == email)
         try:
@@ -41,7 +41,7 @@ class UserRepo:
         self.session.delete(user)
         self.session.commit()
         return True
-    
+
     def soft_delete_user(self, user_id: int) -> bool:
         user = self.session.get(self.model, user_id)
         if not user or not user.is_active:
@@ -49,7 +49,12 @@ class UserRepo:
         user.is_active = False
         self.session.commit()
         return True
-        
-        
-    
+
+    def get_all_users(self) -> list[User]:
+        stmt = select(self.model).options(joinedload(self.model.subscriptions))
+        users_with_subscriptions = self.session.scalars(stmt).unique().all()
+        return users_with_subscriptions
+
+
+
 

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from src.models.subscription import Subscription
 from src.repository.subscription import SubscriptionRepo
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi import APIRouter
 from src.config import settings
@@ -18,17 +18,42 @@ from src.__main__ import app
 from src.models.users import User
 from src.routes import user
 from src.routes.subscription import SubscriptionResponceModel
+from src.services.jwt_token_services import JWTService
 from src.services.password_service import PasswordsService
 from typing import Generator
-
+from src.services.jwt_token_services import JWTService
+from src.models.base import Base
 # Create engine outside fixture so it persists
-engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
-TestingSessionLocal = sessionmaker(bind=engine)
+
 
 
 @pytest.fixture(scope='function')
-def get_session() -> Session:
-    session = TestingSessionLocal()
+def test_engine():
+    engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+    yield engine
+
+
+@pytest.fixture(scope='function', autouse=True)
+def clean_database(test_engine):
+    """Automatically clean all data after each test"""
+    yield  # Run the test first
+    # Clean up after the test
+    with test_engine.connect() as connection:
+        # Get all table names and truncate them
+        for table in reversed(Base.metadata.sorted_tables):
+            connection.execute(text(f"DELETE FROM {table.name}"))
+        connection.commit()
+
+
+@pytest.fixture(scope='function')
+def test_session_factory(test_engine):
+    TestingSessionLocal = sessionmaker(bind=test_engine)
+    yield TestingSessionLocal
+
+
+@pytest.fixture(scope='function')
+def get_session(test_session_factory) -> Session:
+    session = test_session_factory()
     try:
         yield session
     finally:
@@ -43,7 +68,7 @@ def add_user(get_session)-> User:
     user = User(email=faker.email(), hashed_password=pasword_service.create_hash(password))
     get_session.add(user)
     get_session.commit()
-    get_session.refresh(user) 
+    get_session.refresh(user)
     yield user
     get_session.delete(user)
     get_session.commit()
@@ -68,19 +93,27 @@ def add_subscriptions(get_session, add_user):
         notes=faker.sentence(nb_words=6),
         logo_url=faker.image_url(),
         created_at=now)
-                                 
+
     get_session.add(subscription)
     get_session.commit()
-    get_session.refresh(subscription) 
+    get_session.refresh(subscription)
     yield subscription
     get_session.delete(subscription)
     get_session.commit()
 
-@pytest.fixture       
+@pytest.fixture
 def get_app() -> TestClient:
     return TestClient(app=app)
-    
+
 '''
 Создать фикстуру которая добавляет данные перед тестом в базу данных
 а потом очищает базу данных
 '''
+# @pytest.fixture
+# def get_category():
+
+@pytest.fixture
+def user_with_jwt(add_user):
+    jwt_token = JWTService(config=settings).create_jwt(add_user.id)
+    setattr(add_user, 'token', jwt_token )
+    return add_user

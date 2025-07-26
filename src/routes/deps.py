@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.config import settings
+from src.repository.expenses import ExpensesRepo
 from src.repository.subscription import SubscriptionRepo
 from src.repository.user import UserRepo
 from src.services.jwt_token_services import JWTService
@@ -26,7 +27,7 @@ def get_user_repo(session: SessionDep) -> UserRepo:
 UserRepoDep = Annotated[UserRepo, Depends(get_user_repo)]
 
 def get_subscription_repo(session: SessionDep) -> SubscriptionRepo:
-    return SubscriptionRepo(sessiom=session)
+    return SubscriptionRepo(session=session)
 
 SubscriptionRepoDep = Annotated[SubscriptionRepo, Depends(get_subscription_repo)]
 
@@ -40,4 +41,7 @@ def get_jwt_service()-> JWTService:
 
 JWTServiceDep = Annotated[JWTService, Depends(get_jwt_service)]
 
+def get_expenses_repo(session:SessionDep) -> ExpensesRepo:
+    return ExpensesRepo(session=session)
 
+ExpensesRepoDep = Annotated[ExpensesRepo, Depends(get_expenses_repo)]
