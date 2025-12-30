@@ -13,7 +13,7 @@ from .deps import UserRepoDep
 router= APIRouter(prefix='/user')
 
 class UserResponceModel(BaseModel):
-    id: int 
+    id: int
     email: EmailStr
     hashed_password: str
     is_active: bool
@@ -24,15 +24,15 @@ class UserResponceModel(BaseModel):
 def root(id: int, user_repo: UserRepoDep):
     try:
         user = user_repo.back_information_from_user(id)
-        return user   
+        return user
     except NoUserInDb:
         raise HTTPException(status_code=404, detail="User not found")
-    
 
-    
-     
+#TODO почитать что такое идемпотентность
 
-    
+
+
+
 
 
 
@@ -40,6 +40,6 @@ def root(id: int, user_repo: UserRepoDep):
 # def register_user():
 #     engine=create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 #     session=sessionmaker(bind=engine)
-#     with session() as session: 
+#     with session() as session:
 #         create_UserRepo = UserRepo(session=session).register_user(password, email)
 #         return UserResponceModel(**create_UserRepo)

@@ -18,7 +18,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
-    # expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
+    expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
     # payment_history = relationship("PaymentHistory", back_populates="user", cascade="all, delete-orphan")
     # trial_notifications = relationship("TrialNotification", back_populates="user", cascade="all, delete-orphan")
     # notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")

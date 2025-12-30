@@ -14,7 +14,7 @@ class ExpensesRepo:
         result = self.session.execute(stmt)
         return result.scalars().all()
 
-    def create(self, subscription: Subscription):
+    def create(self, subscription: Subscription) -> Expense:
         new_expense = Expense(
         user_id=subscription.user_id,
         subscription_id=subscription.id,
@@ -24,6 +24,12 @@ class ExpensesRepo:
         date=datetime.now(),
         category =subscription.category
         )
+        self.session.add(new_expense)
+        self.session.commit()
+        return new_expense
+
+    def create_new(self, user_id, id, name, currency, category):
+        return self.create()
 
 
 # GET	/expenses/summary	Получить сводку расходов по категориям

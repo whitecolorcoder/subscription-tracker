@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID, uuid4
 from datetime import datetime
 from decimal import Decimal
-# from src.models.expenses import Expense
+from src.models.expenses import Expense
 # from src.models.users import User
 
 from .base import Base  # Базовый класс моделей

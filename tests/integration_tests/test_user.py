@@ -37,8 +37,6 @@ def test_sucess_user_registration(get_app, get_session):
     get_session.delete(user)
     get_session.commit()
 
-
-
 def test_user_already_exsists(get_app, add_user):
     duplicate_response = get_app.post(
         '/auth/protected',
@@ -129,3 +127,10 @@ def test_delete_subscription(get_app, user_with_jwt, add_subscriptions):
     )
     assert response.status_code == 200
 
+def test_analitics_overviwe(get_app, user_with_jwt, add_expenses):
+    response = get_app.get(
+        f'/anlytics/',
+        headers={
+            'Authorization': f"Bearer {user_with_jwt.token}"
+            }
+    )

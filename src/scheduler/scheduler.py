@@ -425,17 +425,19 @@ def setup_default_jobs():
             job_id="subscription_reminders"
         )
 
-        # Example: Check for trial expiries daily at 9:00 AM
-        scheduler_service.add_cron_job(
-            expense_counter,  # Pass the callable instance
-            hour=9,
-            minute=0,
-            job_id="trial_expiry_check"
-        )
+        # # Example: Check for trial expiries daily at 9:00 AM
+        # scheduler_service.add_cron_job(
+        #     expense_counter,  # Pass the callable instance
+        #     hour=9,
+        #     minute=0,
+        #     job_id="trial_expiry_check"
+        # )
 
         logger.info("Default jobs setup completed")
 
     except Exception as e:
+        logger.error(f"Failed to setup default jobs: {e}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         logger.error(f"Failed to setup default jobs: {e}")
 
 
@@ -457,9 +459,57 @@ def cleanup_scheduler():
     """Cleanup scheduler on application shutdown"""
     scheduler_service.shutdown()
 
-if __name__=='__main__':
+# ...existing code...
+if __name__ == '__main__':
     import traceback
     try:
+        print("Starting scheduler...")
         initialize_scheduler()
+
+        print("Scheduler initialized successfully!")
+        print("Current jobs:")
+
+        # Show initial job status
+        jobs = scheduler_service.get_jobs()
+        for job in jobs:
+            print(f"  - Job ID: {job['id']}")
+            print(f"    Type: {job['trigger_type']}")
+            print(f"    Next run: {job['next_run']}")
+            print(f"    Is paused: {job['is_paused']}")
+            print()
+
+        print("Scheduler is running. Press Ctrl+C to stop.")
+        print("=" * 50)
+
+        # Keep the program running and show periodic status
+        while True:
+            time.sleep(10)  # Wait 10 seconds between status updates
+
+            jobs = scheduler_service.get_jobs()
+            running_count = sum(job['running_instances'] for job in jobs)
+
+            print(f"\n[{datetime.now().strftime('%H:%M:%S')}] Status Update:")
+            print(f"  Total jobs: {len(jobs)}")
+            print(f"  Currently running: {running_count}")
+
+            for job in jobs:
+                status = "RUNNING" if job['running_instances'] > 0 else "WAITING"
+                if job['is_paused']:
+                    status = "PAUSED"
+
+                print(f"  - {job['id']}: {status}")
+                if job['last_run']:
+                    print(f"    Last run: {job['last_run'].strftime('%H:%M:%S')}")
+                if job['next_run']:
+                    print(f"    Next run: {job['next_run'].strftime('%H:%M:%S')}")
+
+    except KeyboardInterrupt:
+        print("\n\nShutting down scheduler...")
+        cleanup_scheduler()
+        print("Scheduler stopped.")
+
     except Exception as e:
-        print(traceback.print_exc(e))
+        print(f"\nError occurred: {e}")
+        print("\nFull traceback:")
+        print(traceback.format_exc())  # Fixed this line
+        cleanup_scheduler()

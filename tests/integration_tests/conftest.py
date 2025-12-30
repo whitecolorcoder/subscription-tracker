@@ -5,7 +5,10 @@ from typing import Annotated
 from faker import Faker
 
 from datetime import datetime, timedelta
+
+import redis
 from src.models.subscription import Subscription
+from src.redis_repository.redis_repo import AnalyticsRedis
 from src.repository.subscription import SubscriptionRepo
 import pytest
 from sqlalchemy import create_engine, text
@@ -23,8 +26,13 @@ from src.services.password_service import PasswordsService
 from typing import Generator
 from src.services.jwt_token_services import JWTService
 from src.models.base import Base
+from src.models.expenses import Expense
 # Create engine outside fixture so it persists
 
+
+@pytest.fixture
+def get_app() -> TestClient:
+    return TestClient(app=app)
 
 
 @pytest.fixture(scope='function')
@@ -101,19 +109,46 @@ def add_subscriptions(get_session, add_user):
     get_session.delete(subscription)
     get_session.commit()
 
-@pytest.fixture
-def get_app() -> TestClient:
-    return TestClient(app=app)
-
-'''
-Создать фикстуру которая добавляет данные перед тестом в базу данных
-а потом очищает базу данных
-'''
-# @pytest.fixture
-# def get_category():
 
 @pytest.fixture
 def user_with_jwt(add_user):
     jwt_token = JWTService(config=settings).create_jwt(add_user.id)
     setattr(add_user, 'token', jwt_token )
     return add_user
+
+
+@pytest.fixture(scope='function')
+def add_expenses(add_subscriptions, get_session):
+    total  = 0
+    for i in range(5):
+        amount = round(random.uniform(5.0, 100.0), 2)
+        total += amount
+        expence = Expense(
+            subscription_id=add_subscriptions.id,
+            user_id=add_subscriptions.user_id,
+            amount=amount,
+            currency=random.choice(["USD", "EUR", "RSD", "GBP"]),
+            date=datetime.utcnow() - timedelta(days=random.randint(1, 30)),
+            description=f"Expense {i+1}",
+            category=random.choice(["Streaming", "Software", "Fitness", "Education"])
+        )
+        
+        get_session.add(expence)
+    
+    
+    get_session.commit()
+    yield add_subscriptions, total
+    
+@pytest.fixture(scope='function')
+def redis_client():
+    client = redis.Redis(
+        host='localhost',
+        port=6379,
+        db=0,
+        decode_responses=True
+    )
+    return client
+
+@pytest.fixture(scope='function')
+def redis_repo(redis_client):
+    return AnalyticsRedis(redis_client)

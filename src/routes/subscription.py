@@ -30,7 +30,16 @@ class SubscriptionResponceModel(BaseModel):
     logo_url: str
     created_at: datetime
 
-
+class SubscriptionOverview(SubscriptionResponceModel):
+    sum_expenses: float
+    
+    class Config:
+        from_attributes = True
+        
+        
+class SubscritptionsOverviewList(BaseModel):
+    subscriptions: list[SubscriptionOverview]
+    
 # @router.get("/", response_model=SubscriptionModel)
 # def register_subscription(id: int, subscription_repo: SubscriptionRepoDep):
 #     return SubscriptionModel(**subscription_repo.list_subscription_users(id))
@@ -92,6 +101,7 @@ class SubscriptionResponse(BaseModel):
     notes: str
     logo_url: Optional[HttpUrl]
     created_at: datetime
+     
 
 @router.post("/", response_model=SubscriptionResponceModel, status_code=201)
 def post_new_subscription(
@@ -124,6 +134,7 @@ def put_subscription(body: SubscriptionPatch,
     return repository.update_subscription(user_id=token_service.check_jwt(token.credentials),
                                           **body.dict(exclude_none=True))
 
+#TODO на этот роутер
 
 @router.delete('/{subscription_id}', response_model=SubscriptionResponceModel, status_code=200)
 def del_subscription(subscription_id: int,

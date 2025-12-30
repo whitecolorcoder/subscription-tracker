@@ -1,11 +1,17 @@
+from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from src.models.expenses import Expense
 from src.models.subscription import Subscription
 import typing
 
+from fastapi.websockets import WebSocket
+
 if typing.TYPE_CHECKING:
     from src.routes.subscription import SubscriptionCreate
+from sqlalchemy.orm import joinedload
+from sqlalchemy import func
 
 
 class SubscriptionRepo:
@@ -48,7 +54,7 @@ class SubscriptionRepo:
         self.session.refresh(new_subscription)
         return new_subscription
 
-    def get_filtered_subscriptions_sync(self, user_id: int, filters: dict)-> list[Subscription]:
+    def get_filtered_subscriptions_sync(self, user_id: int, filters: dict[str:str])-> list[Subscription]:
         query = self.session.query(Subscription).filter(Subscription.user_id == user_id)
 
         if "categories" in filters:
@@ -80,3 +86,48 @@ class SubscriptionRepo:
         self.session.delete(subscription)
         self.session.commit()
         return subscription
+
+    def sum_price_by_category(self, category: str, user_id: int) -> int:
+        user_subcriptions = self.get_filtered_subscriptions_sync(user_id, filters={'category': category})
+        count = 0
+        for i in user_subcriptions:
+            count +=i.price
+        return count
+
+    def get_nextpayment_user(self) -> list[Subscription]:
+        threshold_date = datetime.now() + timedelta(days=3)
+
+        # Filter directly in the database
+        subscriptions = (
+            self.session.query(Subscription.user_id)
+            .filter(Subscription.next_payment <= threshold_date)
+            .all()
+        )
+        return subscriptions
+
+    def get_subs_from_bd(self) -> list[Subscription]:
+        stmt = self.session.query(Subscription).filter(Subscription.next_payment - datetime.now() <= timedelta(days=3))
+        return stmt.all()
+    
+    def get_overview_by_analytics(self, user_id: int, last_data: datetime.date = None):
+        stmt = (
+            self.session.query(Subscription)
+            .add_columns(func.coalesce(func.sum(Expense.amount), 0).label("total_expenses"))
+            .outerjoin(Expense, Subscription.id == Expense.subscription_id)
+            .filter(Subscription.user_id == user_id)
+            .group_by(Subscription.id)
+            .order_by(Subscription.next_payment)
+            ) 
+        
+        if last_data:
+            today = datetime.now().date()
+            stmt = stmt.filter(Expense.date >= last_data, Expense.date <= today) 
+            
+        result = stmt.all()
+
+        for i in result:
+            setattr(i[0], "sum_expenses", i[1])
+            
+        return result
+    
+    # разобраться с методом 
