@@ -129,8 +129,7 @@ def add_expenses(add_subscriptions, get_session):
             amount=amount,
             currency=random.choice(["USD", "EUR", "RSD", "GBP"]),
             date=datetime.utcnow() - timedelta(days=random.randint(1, 30)),
-            description=f"Expense {i+1}",
-            category=random.choice(["Streaming", "Software", "Fitness", "Education"])
+            description=f"Expense {i+1}"
         )
         
         get_session.add(expence)
