@@ -21,7 +21,6 @@ class Expense(Base):
     currency: Mapped[str] = mapped_column(String(8))
     date: Mapped[datetime] = mapped_column(DateTime)
     description: Mapped[str] = mapped_column(Text)
-    category: Mapped[str] = mapped_column(String(100))#TODO убрать поле сделать миграцию
 
     user = relationship("User", back_populates="expenses")
     subscription = relationship("Subscription", back_populates="expenses")
