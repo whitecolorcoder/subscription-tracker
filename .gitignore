@@ -4,4 +4,4 @@
 .arch.drawio/
 .pre-run.ps1
 .pyproject.toml
-requirements.txt
+.requirements.txt
