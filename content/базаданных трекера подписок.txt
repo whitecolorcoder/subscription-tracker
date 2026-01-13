@@ -1,0 +1,96 @@
+erDiagram
+    users {
+        UUID id PK "Уникальный идентификатор"
+        string email "Email (уникальный)"
+        string hashed_password "Хеш пароля"
+        bool is_active "Активен?"
+        decimal subscription_budget "Лимит расходов"
+        string currency_preference "Предпочитаемая валюта"
+        datetime created_at "Дата регистрации"
+    }
+
+    subscriptions {
+        UUID id PK "ID подписки"
+        UUID user_id FK "Ссылка на пользователя"
+        string name "Название"
+        string category "Категория"
+        decimal price "Цена"
+        string currency "Валюта"
+        string billing_period "Период оплаты"
+        datetime next_payment "Следующий платеж"
+        datetime trial_ends_at "Окончание пробного периода"
+        bool is_active "Активна?"
+        bool auto_renew "Автопродление"
+        string notes "Заметки"
+        string logo_url "Ссылка на логотип"
+        datetime created_at "Дата создания"
+    }
+
+    expenses {
+        UUID id PK "ID расхода"
+        UUID user_id FK "Ссылка на пользователя"
+        UUID subscription_id FK "Ссылка на подписку (опц.)"
+        decimal amount "Сумма"
+        string currency "Валюта"
+        datetime date "Дата"
+        text description "Описание"
+        string category "Категория"
+    }
+
+    payment_history {
+        UUID id PK "ID платежа"
+        UUID user_id FK "Пользователь"
+        UUID subscription_id FK "Подписка (опц.)"
+        decimal amount "Сумма"
+        string currency "Валюта"
+        string status "Статус (success/failed)"
+        datetime payment_date "Дата платежа"
+        string gateway "Платежная система"
+        string receipt_url "Ссылка на чек"
+    }
+
+    trial_notifications {
+        UUID id PK "ID уведомления"
+        UUID user_id FK "Пользователь"
+        UUID subscription_id FK "Подписка"
+        datetime notify_at "Когда уведомить"
+        bool is_sent "Отправлено?"
+        datetime sent_at "Фактическая отправка"
+    }
+
+    notifications {
+        UUID id PK "ID уведомления"
+        UUID user_id FK "Получатель"
+        UUID subscription_id FK "Подписка (опц.)"
+        UUID payment_id FK "Платеж (опц.)"
+        string type "Тип (email/tg/ws)"
+        string status "Статус"
+        text message "Текст"
+        datetime sent_at "Время отправки"
+    }
+
+    websocket_sessions {
+        UUID id PK "ID сессии"
+        UUID user_id FK "Пользователь"
+        datetime connected_at "Время подключения"
+        datetime disconnected_at "Время отключения"
+    }
+
+    telegram_links {
+        UUID user_id FK "Пользователь"
+        bigint telegram_id "ID в Telegram"
+        bool confirmed "Подтверждено?"
+    }
+
+    users ||--o{ subscriptions : "Пользователь имеет подписки"
+    users ||--o{ expenses : "Пользователь имеет расходы"
+    users ||--o{ payment_history : "История платежей"
+    users ||--o{ trial_notifications : "Уведомления о пробных периодах"
+    users ||--o{ notifications : "Получает уведомления"
+    users ||--o{ websocket_sessions : "Имеет сессии"
+    users ||--|| telegram_links : "Привязка Telegram"
+    subscriptions ||--o{ expenses : "Генерирует расходы"
+    subscriptions ||--o{ payment_history : "Платежи по подписке"
+    subscriptions ||--o{ trial_notifications : "Требует уведомления"
+    subscriptions ||--o{ notifications : "Генерирует уведомления"
+    payment_history ||--o{ notifications : "Триггерит уведомления"
