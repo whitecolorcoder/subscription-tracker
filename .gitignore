@@ -1,7 +1,7 @@
-.env/
+.env
 .content/
-.alembic.ini/
+.alembic.ini
 .arch.drawio/
-.pre-run.ps1/
-.pyproject.toml/
-.requirements.txt/
+.pre-run.ps1
+.pyproject.toml
+requirements.txt
