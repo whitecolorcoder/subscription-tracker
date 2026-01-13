@@ -1,11 +1,13 @@
 .content/
-.arch.drawio/
-venv_project_subs/
+.env
 .vscode/
 .pre-run.ps1
-.env
+.arch.drawio/
 .alembic.ini
 .pyproject.toml
+
+venv_project_subs/
 requirements.txt
 __pycache__/
 *.pyc
+
