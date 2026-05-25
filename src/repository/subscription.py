@@ -6,11 +6,8 @@ from src.models.expenses import Expense
 from src.models.subscription import Subscription
 import typing
 
-from fastapi.websockets import WebSocket
-
 if typing.TYPE_CHECKING:
     from src.routes.subscription import SubscriptionCreate
-from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 
 

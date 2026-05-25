@@ -3,7 +3,11 @@ from datetime import datetime
 
 import typing
 
-from typing import Union
+from typing import Optional, Union
+from xml.dom.xmlbuilder import Options
+from typing import Optional
+
+# from src.routes.user import UserResponceModel
 
 if typing.TYPE_CHECKING:
     from src.routes.subscription import SubscriptionOverview
@@ -31,4 +35,22 @@ class AnalyticsRedis:
         key = f"user:{user_id}:analytics"
         self.client.set(key, json.dumps(payload))
 
-#маркирование почитать
+STORAGE_CACHE_TIME = 300
+
+class RedisCache:
+    def __init__(self, client) -> None:
+        self.client = client
+
+    def get(self, key: str):
+        raw = self.client.get(key)
+        return json.loads(raw) if raw else None
+
+    def set(self, key: str, value, ttl: int):
+        self.client.set(
+            key,
+            json.dumps(value),
+            ex=ttl
+        )
+
+    def delete(self, key: str):
+        self.client.delete(key)

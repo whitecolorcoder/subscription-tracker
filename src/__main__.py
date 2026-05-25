@@ -10,6 +10,7 @@ from src.routes.ws_routers import router as websocket_router
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from src.services.notifications_service import notification_service
 from src.routes.analytics import router as analytics
+from src.services.middlewere import CashMiddleware
 # from src.services.notifications_service import send_notification
 
 scheduler = AsyncIOScheduler() #создание планировщика задач
@@ -26,6 +27,7 @@ app.include_router(router=subscription_router)
 app.include_router(router=expenses_router)
 app.include_router(router=websocket_router)
 app.include_router(router=analytics, prefix='/anlytics')
+app.add_middleware(middleware_class=CashMiddleware)
 
 @app.on_event('startup')
 def add_cron_job():
@@ -39,3 +41,7 @@ if __name__ == "__main__":
     # запуск приложения с помощью uvicorn
     # host и port берутся из настроек
 
+    
+    # Run project
+    # $env:PYTHONPATH="src"
+    # python -m uvicorn src.main:app --reload --host 127.0.0.1 --port 8000

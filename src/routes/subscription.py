@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 from pydantic import BaseModel, Field, HttpUrl
 
-from src.routes.auth import TokenBodyRequest
+from src.redis_repository.redis_repo import STORAGE_CACHE_TIME
 from src.services.jwt_token_services import JWTService
 from src.config import settings
 
-from .deps import JWTServiceDep, SubscriptionRepoDep
+from .deps import JWTServiceDep, SubscriptionRepoDep, RedisCacheDep
 
 router = APIRouter(prefix="/subscription")
 
@@ -39,17 +39,7 @@ class SubscriptionOverview(SubscriptionResponceModel):
         
 class SubscritptionsOverviewList(BaseModel):
     subscriptions: list[SubscriptionOverview]
-    
-# @router.get("/", response_model=SubscriptionModel)
-# def register_subscription(id: int, subscription_repo: SubscriptionRepoDep):
-#     return SubscriptionModel(**subscription_repo.list_subscription_users(id))
 
-
-# @router.get("/", response_model=list[SubscriptionResponceModel], status_code=201)
-# def get_user_subscriptions(repo: SubscriptionRepoDep, jwt_services: JWTServiceDep, body: TokenBodyRequest):
-#     return repo.get_subscriptions_by_user(jwt_services.check_jwt(body.jwt_token)[1])
-
-#Создать фильтрацию подписок по разным параметрам с помощью Query параметров
 class SubscriptionFilters(BaseModel):
     categories: Optional[list[str]] = Field(None, example=["entertainment", "finance", "joke", "other"])
     is_active: Optional[bool] = Field(None, example=True)
@@ -107,40 +97,52 @@ class SubscriptionResponse(BaseModel):
 def post_new_subscription(
     body: SubscriptionCreateRequest,
     repository: SubscriptionRepoDep,
-    token: str = Depends(HTTPBearer())
-
+    token: str = Depends(HTTPBearer()),
 ):
     user_id = JWTService(settings).check_jwt(token.credentials)
-    return repository.create_subscription(
+    db_val = repository.create_subscription(
         user_id=user_id,
         subscription_data=body
     )
+    return db_val
 
 @router.get("/{subscription_id}",  response_model=SubscriptionResponceModel, status_code=200)
 def get_subscription(
     subscription_id: int,
     repository: SubscriptionRepoDep,
     token_service: JWTServiceDep,
-    token: str = Depends(HTTPBearer())
-):
-
+    token: str = Depends(HTTPBearer()),
+):    
     return repository.get_one_subscription(user_id=token_service.check_jwt(token.credentials), subscription_id=subscription_id)
 
-@router.patch('/', response_model=SubscriptionResponceModel, status_code=200)
-def put_subscription(body: SubscriptionPatch,
+@router.patch("/{id}", response_model=SubscriptionResponceModel, status_code=200)
+def patch_subscription(
+    id: int,
+    body: SubscriptionPatch,
     repository: SubscriptionRepoDep,
     token_service: JWTServiceDep,
-    token: str = Depends(HTTPBearer())):
-    return repository.update_subscription(user_id=token_service.check_jwt(token.credentials),
-                                          **body.dict(exclude_none=True))
-
-#TODO на этот роутер
+    token: str = Depends(HTTPBearer()),
+):
+    user_id = token_service.check_jwt(token.credentials)
+        
+    result = repository.update_subscription(
+    user_id=user_id,
+    **body.dict(exclude_none=True)
+    )
+    return result
 
 @router.delete('/{subscription_id}', response_model=SubscriptionResponceModel, status_code=200)
 def del_subscription(subscription_id: int,
     repository: SubscriptionRepoDep,
     token_service: JWTServiceDep,
     token: str = Depends(HTTPBearer())):
-    return repository.delete_subscription(user_id=token_service.check_jwt(token.credentials),
+
+# вынести логику 'token_service.check_jwt(token.credentials' в миддлвейр либо иньекции через метод колл
+    return repository.delete_subscription(user_id=token_service.check_jwt(token.credentials), 
                                           subscription_id=subscription_id)
 
+# post/put/patch/delete. Организовать идемпотентность данных методов, через middlewere. Данные храним в кеше. 
+# Токены и резельтаты успешных оперраций. Токены создает клиент, сделать проверку на валидацию. Почитать стратегии идемпотентности.
+# Вывести индемпотентность из первых принципов REST арихитектуры.
+
+# Протестировать наш миддлевере. Посмотреть нужен ли нам иденпосиди кий на ручках в теле 

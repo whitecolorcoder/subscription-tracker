@@ -111,7 +111,7 @@ def test_get_subs_by_category(get_app, add_user, add_subscriptions):
 
 def test_patch_subscription(get_app, user_with_jwt, add_subscriptions):
     new_price = float(add_subscriptions.price + 5)
-    response = get_app.patch('/subscription',
+    response = get_app.patch(f'/subscription/{add_subscriptions.id}',
                              headers={'Authorization': "Bearer " + user_with_jwt.token},
                              json={"subscription_id": add_subscriptions.id, 'price': new_price}
                             )

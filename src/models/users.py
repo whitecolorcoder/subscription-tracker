@@ -1,9 +1,7 @@
-from typing import List
 from datetime import datetime
 from .base import Base
-from sqlalchemy import ForeignKey, String, Boolean, DateTime, Float
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-import uuid
+from sqlalchemy import String, Boolean, DateTime, Float
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class User(Base):
@@ -19,12 +17,6 @@ class User(Base):
 
     subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
     expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
-    # payment_history = relationship("PaymentHistory", back_populates="user", cascade="all, delete-orphan")
-    # trial_notifications = relationship("TrialNotification", back_populates="user", cascade="all, delete-orphan")
-    # notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
-    # websocket_sessions = relationship("WebSocketSession", back_populates="user", cascade="all, delete-orphan")
-    # telegram_link = relationship("TelegramLink", back_populates="user", cascade="all, delete-orphan", uselist=False)
-
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, email={self.email!r})"

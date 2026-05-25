@@ -22,7 +22,7 @@ class SubscriptionResponceModel(BaseModel):
     logo_url: str
     created_at: datetime
 
-class BaseExpense(BaseModel):  # Исправлено название (было опечатка)
+class BaseExpense(BaseModel):  
     id: int
     subscription_id: int | None  # Сделайте nullable, если в модели может быть None
     amount: float

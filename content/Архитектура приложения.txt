@@ -1,0 +1,55 @@
+graph TD
+    %% Клиентский слой
+    A[Web/Mobile Clients] -->|HTTP/WebSocket| B[API Gateway]
+    
+    %% API Gateway (FastAPI)
+    B -->|1. Auth| C[Auth Service]
+    B -->|2. User Data| D[User Service]
+    B -->|3. Subscriptions| E[Subscription Service]
+    B -->|4. Expenses| F[Expense Service]
+    B -->|WS| G[WebSocket Manager]
+    
+    %% Сервисы и хранилища
+    C -->|JWT| K[Redis]
+    D --> H[(PostgreSQL)]
+    E --> H
+    F --> H
+    G -->|Sessions| K
+    
+    %% Асинхронные события
+    E -->|Tasks| L[Celery]
+    F -->|Tasks| L
+    L -->|Broker| K
+    L -->|Result Backend| K
+    
+    %% Уведомления
+    L --> J[Notification Service]
+    J -->|Push| G
+    J -->|Email/SMS| P[SMTP/External APIs]
+    
+    %% Периодические задачи
+    M[Celery Beat] -->|Scheduled Tasks| L
+    
+    %% Стили
+    style B fill:#2ecc71,stroke:#27ae60
+    style C fill:#3498db,stroke:#2980b9
+    style D fill:#3498db,stroke:#2980b9
+    style E fill:#3498db,stroke:#2980b9
+    style F fill:#3498db,stroke:#2980b9
+    style L fill:#e74c3c,stroke:#c0392b
+    style J fill:#9b59b6,stroke:#8e44ad
+    style M fill:#e67e22,stroke:#d35400
+    
+    %% Легенда
+    subgraph Legend
+        direction LR
+        gateway[API Gateway]:::gateway
+        service[Microservices]:::service
+        celery[Celery]:::celery
+        beat[Beat]:::beat
+    end
+    
+    classDef gateway fill:#2ecc71,stroke:#27ae60
+    classDef service fill:#3498db,stroke:#2980b9
+    classDef celery fill:#e74c3c,stroke:#c0392b
+    classDef beat fill:#e67e22,stroke:#d35400

@@ -5,9 +5,6 @@ from uuid import UUID, uuid4
 from datetime import datetime
 from decimal import Decimal
 
-# from src.models.subscription import Subscription
-# from src.models.users import User
-
 from .base import Base
 import uuid
 

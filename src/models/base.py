@@ -1,7 +1,4 @@
-from typing import List
-from datetime import datetime
-from sqlalchemy import ForeignKey, String, Boolean, DateTime, Float
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):

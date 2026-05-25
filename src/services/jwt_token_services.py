@@ -1,6 +1,5 @@
 import datetime
 from src.config import Settings
-from src.models.users import User
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
 from typing import Tuple
@@ -17,7 +16,7 @@ class JWTService:
         token = jwt.encode(payload, self.config.SECRET_KEY, algorithm="HS256")
         return token
 
-    def check_jwt(self, token) -> int | Tuple[str, int]:
+    def check_jwt(self, token: str | int) -> int | Tuple[str, int]:
         try:
             payload = jwt.decode(token, self.config.SECRET_KEY, algorithms=["HS256"])
             return payload['user_id']
@@ -27,3 +26,4 @@ class JWTService:
             return new_token, payload['user_id']
         except InvalidTokenError:
             raise InvalidTokenError
+        

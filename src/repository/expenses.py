@@ -32,5 +32,3 @@ class ExpensesRepo:
         return self.create()
 
 
-# GET	/expenses/summary	Получить сводку расходов по категориям
-#  def get_expenses_user_category()

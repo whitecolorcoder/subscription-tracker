@@ -1,0 +1,82 @@
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    "venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    # Pyflakes
+    "F",
+    # pycodestyle
+    "E",
+    "W",
+    # isort
+    "I",
+    # pydocstyle
+    "D",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # flake8-comprehensions
+    "C4",
+    # flake8-pie
+    "PIE",
+    # flake8-print
+    "T20",
+    # flake8-return
+    "RET",
+    # flake8-self
+    "SLF",
+    # flake8-unused-arguments
+    "ARG",
+    # flake8-blind-except
+    "BLE",
+    # pylint
+    "PL",
+    # mccabe
+    "C901",
+]
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 5
+max-complexity = 4
+
+[tool.ruff.isort]
+known-first-party = ["my_app"]
+
+[tool.ruff.lint.pylint]
+max-positional-args = 3
+max-nested-blocks = 3
+max-args = 3
+max-branches = 5
+max-bool-expr = 4
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py files
+"**/test_*.py" = ["D"]    # Don't require docstrings in tests
+"**/tests.py" = ["D"]     # Don't require docstrings in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["common", "sheets", "langchain", "obsidian", "day_productivity", "character", "logs", "time"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

@@ -12,9 +12,9 @@ from src.routes.deps import ExpensesRepoDep, JWTServiceDep, SubscriptionRepoDep
 router = APIRouter(prefix="/expenses")
 
 
-class BaseExpense(BaseModel):  # Исправлено название (было опечатка)
+class BaseExpense(BaseModel): 
     id: int
-    subscription_id: int | None  # Сделайте nullable, если в модели может быть None
+    subscription_id: int | None  
     amount: float
     currency: str
     date: datetime
