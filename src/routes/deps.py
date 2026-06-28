@@ -2,7 +2,7 @@ from typing import Annotated
 from xml.dom.xmlbuilder import Options
 
 from fastapi import Depends
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from src.config import settings
@@ -10,12 +10,13 @@ from src.redis_repository.redis_repo import AnalyticsRedis
 from src.repository.expenses import ExpensesRepo
 from src.repository.subscription import SubscriptionRepo
 from src.repository.user import UserRepo
-# from src.routes.user import UserResponceModel
 from src.services.jwt_token_services import JWTService
 from src.services.password_service import PasswordsService
 import redis
 from src.services.service_analitics import ServiceAnalitics
 from src.redis_repository.redis_repo import RedisCache
+
+
 engine=create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
 def get_session() -> Session:
@@ -84,3 +85,8 @@ def get_user_cache_by_redis(client) -> RedisCache:
     return RedisCache(client)
 
 RedisCacheDep = Annotated[RedisCache, Depends(get_user_cache_by_redis)]
+
+
+
+
+
